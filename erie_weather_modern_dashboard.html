@@ -1,160 +1,178 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Metabolic Weather Display</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather Display</title>
   <style>
     body {
+      background-color: #012952;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
       margin: 0;
-      background-color: #0e2239;
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
+      padding: 2rem;
     }
-    .container {
-      padding: 2vw;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      height: 100vh;
-      box-sizing: border-box;
-    }
+
     .current {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      text-align: left;
-      padding-left: 3vw;
+      text-align: center;
+      margin-bottom: 4rem;
     }
-    .current h1 {
-      font-size: 3vw;
-      margin: 0 0 0.5vw;
+
+    .icon {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
     }
-    .current img {
-      width: 7vw;
-      height: auto;
-      margin-bottom: 0.5vw;
+
+    .temp {
+      font-size: 5rem;
+      margin: 0.5rem 0;
     }
-    .current .temp {
-      font-size: 6vw;
-      font-weight: bold;
-      margin: 0.5vw 0;
+
+    .details {
+      font-size: 1.5rem;
     }
-    .current .summary, .current .details, .current .description {
-      font-size: 1.5vw;
-      margin: 0.3vw 0;
+
+    .description {
+      font-size: 2rem;
+      margin: 1rem 0;
+      text-transform: capitalize;
     }
+
+    .forecast-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
     .forecast {
-      flex: 1;
       display: flex;
       justify-content: space-around;
-      align-items: center;
-      padding: 2vw;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
+
     .day {
-      background-color: #163b5c;
-      padding: 1vw;
-      border-radius: 1vw;
-      width: 12vw;
+      background-color: #0b3c5d;
+      padding: 1rem;
+      border-radius: 10px;
       text-align: center;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      width: 160px;
     }
-    .day.highlight {
-      border: 2px solid #5dade2;
-    }
-    .day h3 {
-      margin: 0.5vw 0;
-      font-size: 1.5vw;
-    }
+
     .day img {
-      width: 5vw;
-      height: auto;
+      width: 80px;
+      height: 80px;
     }
-    .day p {
-      margin: 0.3vw 0;
-      font-size: 1.2vw;
+
+    .day-name {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    .high-low {
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="current">
-      <h1>Current Weather</h1>
-      <img id="weatherIcon" src="" alt="icon"/>
-      <div class="summary" id="weatherMain">Loading...</div>
-      <div class="temp" id="temp">--°F</div>
-      <div class="details" id="details">Wind: -- mph | Humidity: --%</div>
-      <div class="description" id="description">Fetching detailed forecast...</div>
-    </div>
-    <div class="forecast" id="forecast">
-      <!-- Forecast will populate here -->
+  <div class="current">
+    <h1>Current Weather</h1>
+    <img id="current-icon" class="icon" src="" alt="Weather Icon">
+    <div id="description" class="description">Loading...</div>
+    <div id="temp" class="temp">--°F</div>
+    <div class="details">
+      <span id="wind">Wind: -- mph</span> |
+      <span id="humidity">Humidity: --%</span>
     </div>
   </div>
 
+  <div>
+    <div class="forecast-title">5-Day Outlook</div>
+    <div id="forecast" class="forecast">Loading forecast...</div>
+  </div>
+
   <script>
-    const apiKey = "83a7310014209ebb5b1ddd11ec0e47f3";
+    const apiKey = '83a7310014209ebb5b1ddd11ec0e47f3';
     const lat = 42.1292;
     const lon = -80.0851;
 
-    const weatherIcon = document.getElementById("weatherIcon");
-    const weatherMain = document.getElementById("weatherMain");
-    const temp = document.getElementById("temp");
-    const details = document.getElementById("details");
-    const description = document.getElementById("description");
-    const forecast = document.getElementById("forecast");
+    const currentIcon = document.getElementById('current-icon');
+    const description = document.getElementById('description');
+    const temp = document.getElementById('temp');
+    const wind = document.getElementById('wind');
+    const humidity = document.getElementById('humidity');
+    const forecastContainer = document.getElementById('forecast');
 
-    function titleCase(str) {
-      return str.toLowerCase().replace(/(^|\s)\S/g, t => t.toUpperCase());
-    }
-
-    function getDay(dt) {
-      return new Date(dt * 1000).toLocaleDateString("en-US", { weekday: 'short' });
-    }
-
-    async function getWeather() {
+    async function fetchWeather() {
       try {
-        const response = await fetch(
-          `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&units=imperial&appid=${apiKey}`
-        );
-        const data = await response.json();
+        const [currentRes, forecastRes] = await Promise.all([
+          fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`),
+          fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`)
+        ]);
 
-        const current = data.current;
-        const today = data.daily[0];
-        const icon = current.weather[0].icon;
-        weatherIcon.src = `https://openweathermap.org/img/wn/${icon}@4x.png`;
-        weatherMain.textContent = titleCase(current.weather[0].description);
-        temp.textContent = `${Math.round(current.temp)}°F`;
-        details.textContent = `Wind: ${Math.round(current.wind_speed)} mph | Humidity: ${current.humidity}%`;
-        description.textContent = `Expect ${current.weather[0].description} today with a high near ${Math.round(today.temp.max)}°F and low of ${Math.round(today.temp.min)}°F.`;
+        const current = await currentRes.json();
+        const forecast = await forecastRes.json();
 
-        let forecastHTML = "";
-        data.daily.slice(0, 5).forEach((day, idx) => {
-          const dayName = getDay(day.dt);
-          const icon = day.weather[0].icon;
-          const high = Math.round(day.temp.max);
-          const low = Math.round(day.temp.min);
-          const desc = titleCase(day.weather[0].description);
-
-          forecastHTML += `
-            <div class="day${idx === 0 ? " highlight" : ""}">
-              <h3>${dayName}</h3>
-              <img src="https://openweathermap.org/img/wn/${icon}@4x.png" alt="${desc}">
-              <p>${desc}</p>
-              <p>${high}° / ${low}°F</p>
-            </div>`;
-        });
-        forecast.innerHTML = forecastHTML;
+        updateCurrent(current);
+        updateForecast(forecast.list);
       } catch (err) {
-        console.error(err);
-        weatherMain.textContent = "Error fetching weather";
-        description.textContent = "";
+        console.error('Weather fetch failed', err);
+        description.textContent = 'Error fetching weather';
+        forecastContainer.innerHTML = '<p>Failed to load forecast.</p>';
       }
     }
 
-    getWeather();
-    setInterval(getWeather, 15 * 60 * 1000);
+    function updateCurrent(data) {
+      description.textContent = data.weather[0].description;
+      temp.textContent = `${Math.round(data.main.temp)}°F`;
+      wind.textContent = `Wind: ${data.wind.speed} mph`;
+      humidity.textContent = `Humidity: ${data.main.humidity}%`;
+      currentIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
+    }
+
+    function updateForecast(list) {
+      const daily = {};
+
+      list.forEach(item => {
+        const date = new Date(item.dt_txt);
+        const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+        const key = date.toDateString();
+
+        if (!daily[key]) {
+          daily[key] = {
+            day,
+            temps: [],
+            icon: item.weather[0].icon,
+            desc: item.weather[0].description
+          };
+        }
+
+        daily[key].temps.push(item.main.temp);
+      });
+
+      const days = Object.values(daily).slice(1, 6); // skip today, show next 5
+
+      forecastContainer.innerHTML = '';
+      days.forEach(d => {
+        const min = Math.round(Math.min(...d.temps));
+        const max = Math.round(Math.max(...d.temps));
+
+        const card = document.createElement('div');
+        card.className = 'day';
+        card.innerHTML = `
+          <div class="day-name">${d.day}</div>
+          <img src="https://openweathermap.org/img/wn/${d.icon}@2x.png" alt="${d.desc}">
+          <div>${d.desc}</div>
+          <div class="high-low">${min}° / ${max}°F</div>
+        `;
+        forecastContainer.appendChild(card);
+      });
+    }
+
+    fetchWeather();
   </script>
 </body>
 </html>
+
