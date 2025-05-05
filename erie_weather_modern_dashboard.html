@@ -225,92 +225,68 @@ let totalScreens = 3;
       }
     }
 
-    async function loadForecast() {
-      try {
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?zip=${zip},US&units=imperial&appid=${apiKey}`);
-        const data = await res.json();
-
-        const forecastGrid = document.getElementById("forecastGrid");
-        forecastGrid.innerHTML = "";
-
-        const daily = data.list.filter((_, i) => i % 8 === 0).slice(0, 5);
-        daily.forEach((item, idx) => {
-          const date = new Date(item.dt_txt);
-          const day = date.toLocaleDateString('en-US', { weekday: 'short' });
-          const temp = Math.round(item.main.temp);
-          const desc = item.weather[0].description;
-          const icon = getIcon(item.weather[0].icon);
-
-          const card = document.createElement("div");
-          card.className = "day-card" + (idx === 0 ? " today" : "");
-
-          card.innerHTML = `
-            <div class="label">${day}</div>
-            <img src="${icon}">
-            <div class="desc">${desc}</div>
-            <div class="temp">${Math.round(item.main.temp_min)}° / ${Math.round(item.main.temp_max)}°F</div>
-          `;
-          forecastGrid.appendChild(card);
-        });
-      } catch (e) {
-        document.getElementById("forecastGrid").innerHTML = "Forecast unavailable.";
-      }
-    }
-
-    loadWeather();
-    loadForecast();
-    setInterval(() => {
-      loadWeather();
-      loadForecast();
-    }, 600000);
-  
-async function loadHourly() {
-  try {
+    async function loadForecast() {  try {
     const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?zip=${zip},US&units=imperial&appid=${apiKey}`);
     const data = await res.json();
-    const hourlyGrid = document.getElementById("hourlyGrid");
-    hourlyGrid.innerHTML = "";
+    const forecastGrid = document.getElementById("forecastGrid");
+    forecastGrid.innerHTML = "";
 
-    const now = new Date();
-    const upcoming = data.list.filter(item => {
-      const dt = new Date(item.dt_txt);
-      return dt > now && dt.getHours() % 3 === 0;
-    }).slice(0, 8); // show next 8 time blocks (24 hours)
+    const dailyData = {};
 
-    upcoming.forEach(item => {
-      const time = new Date(item.dt_txt).toLocaleTimeString([], { hour: 'numeric' });
-      const icon = getIcon(item.weather[0].icon);
+    data.list.forEach(item => {
+      const date = item.dt_txt.split(" ")[0];
+      if (!dailyData[date]) {
+        dailyData[date] = {
+          temps: [],
+          icons: {},
+          descriptions: {}
+        };
+      }
+
+      const temp = item.main.temp;
+      dailyData[date].temps.push(temp);
+
+      const icon = item.weather[0].icon;
       const desc = item.weather[0].description;
-      const temp = Math.round(item.main.temp);
+      dailyData[date].icons[icon] = (dailyData[date].icons[icon] || 0) + 1;
+      dailyData[date].descriptions[desc] = (dailyData[date].descriptions[desc] || 0) + 1;
+    });
+
+    const dates = Object.keys(dailyData).slice(0, 5);
+    dates.forEach((date, idx) => {
+      const dateObj = new Date(date);
+      const day = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+      const temps = dailyData[date].temps;
+      const max = Math.max(...temps);
+      const min = Math.min(...temps);
+
+      const icon = Object.entries(dailyData[date].icons).sort((a, b) => b[1] - a[1])[0][0];
+      const desc = Object.entries(dailyData[date].descriptions).sort((a, b) => b[1] - a[1])[0][0];
 
       const card = document.createElement("div");
-      card.className = "hour-card";
+      card.className = "day-card" + (idx === 0 ? " today" : "");
+
       card.innerHTML = `
-        <div class="label">${time}</div>
-        <img src="${icon}">
+        <div class="label">${day}</div>
+        <img src="${getIcon(icon)}">
         <div class="desc">${desc}</div>
-        <div class="temp">${temp}°F</div>
+        <div class="temp">${Math.round(max)}° / ${Math.round(min)}°F</div>
       `;
-      hourlyGrid.appendChild(card);
+      forecastGrid.appendChild(card);
     });
   } catch (e) {
-    document.getElementById("hourlyGrid").innerHTML = "Hourly forecast unavailable.";
+    document.getElementById("forecastGrid").innerHTML = "Forecast unavailable.";
   }
-}
-
-setInterval(() => {
-  loadWeather();
-  loadForecast();
-  loadHourly();
-}, 600000);
-loadHourly();
-
-</script>
+}</script>
 
 <div id="hourlyScreen" class="screen">
   <div class="forecast-title">24-Hour Forecast</div>
   <div class="forecast" id="hourlyGrid" style="flex-wrap: wrap; gap: 1vw;"></div>
 </div>
+
+</body>
+</html>
+
 
 </body>
 </html>
