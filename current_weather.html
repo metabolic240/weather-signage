@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Current Weather - MDA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #062f52;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .logo {
+      width: 300px;
+      margin-bottom: 2rem;
+      filter: brightness(0) invert(1);
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .weather-icon {
+      width: 150px;
+      height: 150px;
+    }
+    .description {
+      font-size: 2rem;
+      text-transform: capitalize;
+      margin: 1rem 0;
+    }
+    .temperature {
+      font-size: 5rem;
+      font-weight: bold;
+    }
+    .details {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <img src="logo.png" alt="logo" class="logo" />
+  <h1>Current Weather</h1>
+  <img id="weatherIcon" class="weather-icon" alt="icon" />
+  <div class="description" id="description">Loading...</div>
+  <div class="temperature" id="temp">--°F</div>
+  <div class="details" id="details">Wind: -- mph | Humidity: --%</div>
+
+  <script>
+    const apiKey = "83a7310014209ebb5b1ddd11ec0e47f3";
+    const lat = 42.1292;
+    const lon = -80.0851;
+    const iconUrl = "https://openweathermap.org/img/wn/";
+
+    const weatherIcon = document.getElementById('weatherIcon');
+    const description = document.getElementById('description');
+    const temp = document.getElementById('temp');
+    const details = document.getElementById('details');
+
+    async function fetchWeather() {
+      const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`);
+      const data = await res.json();
+
+      description.textContent = data.weather[0].description;
+      temp.textContent = `${Math.round(data.main.temp)}°F`;
+      details.textContent = `Wind: ${data.wind.speed} mph | Humidity: ${data.main.humidity}%`;
+      weatherIcon.src = iconUrl + data.weather[0].icon + "@4x.png";
+    }
+
+    fetchWeather();
+  </script>
+</body>
+</html>

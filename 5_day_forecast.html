@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>5-Day Forecast - MDA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #062f52;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    .logo {
+      width: 300px;
+      filter: brightness(0) invert(1);
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+    }
+    .forecast-grid {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1600px;
+    }
+    .day-card {
+      flex: 1;
+      margin: 0 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .day-card img {
+      width: 100px;
+      height: 100px;
+    }
+    .day-name {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .desc, .temps {
+      font-size: 1.2rem;
+      margin: 0.2rem 0;
+      text-transform: capitalize;
+    }
+  </style>
+</head>
+<body>
+  <img src="logo.png" alt="logo" class="logo" />
+  <h1>5-Day Outlook</h1>
+  <div class="forecast-grid" id="forecastGrid"></div>
+
+  <script>
+    const apiKey = "83a7310014209ebb5b1ddd11ec0e47f3";
+    const lat = 42.1292;
+    const lon = -80.0851;
+    const iconUrl = "https://openweathermap.org/img/wn/";
+
+    async function fetchForecast() {
+      const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`);
+      const data = await res.json();
+      const forecastGrid = document.getElementById('forecastGrid');
+
+      const daily = {};
+      data.list.forEach(entry => {
+        const date = new Date(entry.dt_txt);
+        const day = date.toLocaleDateString("en-US", { weekday: "short" });
+        if (!daily[day]) {
+          daily[day] = { high: entry.main.temp_max, low: entry.main.temp_min, desc: entry.weather[0].description, icon: entry.weather[0].icon };
+        } else {
+          daily[day].high = Math.max(daily[day].high, entry.main.temp_max);
+          daily[day].low = Math.min(daily[day].low, entry.main.temp_min);
+        }
+      });
+
+      Object.entries(daily).slice(0, 5).forEach(([day, data]) => {
+        const card = document.createElement("div");
+        card.className = "day-card";
+        card.innerHTML = `
+          <div class="day-name">${day}</div>
+          <img src="${iconUrl + data.icon}@4x.png" />
+          <div class="desc">${data.desc}</div>
+          <div class="temps">${Math.round(data.low)}° / ${Math.round(data.high)}°F</div>
+        `;
+        forecastGrid.appendChild(card);
+      });
+    }
+
+    fetchForecast();
+  </script>
+</body>
+</html>
