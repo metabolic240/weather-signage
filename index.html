@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Display - MDA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #062f52;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .container {
+      text-align: center;
+      transition: opacity 1s ease;
+    }
+    .hidden {
+      opacity: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+    .weather-icon {
+      width: 100px;
+      height: 100px;
+    }
+    .logo {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 150px;
+      opacity: 0.7;
+      filter: brightness(0) invert(1);
+    }
+    .forecast-grid {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      justify-content: center;
+    }
+    .day-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      width: 140px;
+    }
+  </style>
+</head>
+<body>
+  <img src="logo.png" alt="logo" class="logo" />
+  <div class="container" id="currentWeather">
+    <h1>Current Weather</h1>
+    <img id="weatherIcon" class="weather-icon" alt="icon">
+    <h2 id="description">Loading...</h2>
+    <h1 id="temp">--°F</h1>
+    <p id="details">Wind: -- mph | Humidity: --%</p>
+  </div>
+
+  <div class="container hidden" id="forecastWeather">
+    <h2>5-Day Outlook</h2>
+    <div class="forecast-grid" id="forecastGrid"></div>
+  </div>
+
+  <script>
+    const apiKey = "e32e1e1d1188e4fa7b87a7f15f04b6c4";
+    const lat = 42.1292;
+    const lon = -80.0851;
+    const iconUrl = "https://openweathermap.org/img/wn/";
+
+    const current = document.getElementById('currentWeather');
+    const forecast = document.getElementById('forecastWeather');
+    const weatherIcon = document.getElementById('weatherIcon');
+    const description = document.getElementById('description');
+    const temp = document.getElementById('temp');
+    const details = document.getElementById('details');
+    const forecastGrid = document.getElementById('forecastGrid');
+
+    async function fetchWeather() {
+      const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`);
+      const weatherData = await weatherRes.json();
+
+      description.textContent = weatherData.weather[0].description.replace(/\w/g, c => c.toUpperCase());
+      temp.textContent = `${Math.round(weatherData.main.temp)}°F`;
+      details.textContent = `Wind: ${weatherData.wind.speed} mph | Humidity: ${weatherData.main.humidity}%`;
+      weatherIcon.src = iconUrl + `${weatherData.weather[0].icon}@4x.png`;
+
+      const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`);
+      const forecastData = await forecastRes.json();
+      forecastGrid.innerHTML = "";
+
+      const daily = {};
+      forecastData.list.forEach(entry => {
+        const date = new Date(entry.dt_txt).toLocaleDateString("en-US", { weekday: "short" });
+        if (!daily[date]) {
+          daily[date] = { high: entry.main.temp_max, low: entry.main.temp_min, desc: entry.weather[0].description, icon: entry.weather[0].icon };
+        } else {
+          daily[date].high = Math.max(daily[date].high, entry.main.temp_max);
+          daily[date].low = Math.min(daily[date].low, entry.main.temp_min);
+        }
+      });
+
+      Object.entries(daily).slice(0, 5).forEach(([day, data]) => {
+        const card = document.createElement("div");
+        card.className = "day-card";
+        card.innerHTML = `
+          <h3>${day}</h3>
+          <img src="${iconUrl + data.icon}@2x.png" width="60" />
+          <p>${data.desc}</p>
+          <p>${Math.round(data.low)}° / ${Math.round(data.high)}°F</p>
+        `;
+        forecastGrid.appendChild(card);
+      });
+    }
+
+    fetchWeather();
+    setInterval(() => {
+      current.classList.toggle("hidden");
+      forecast.classList.toggle("hidden");
+    }, 10000);
+  </script>
+</body>
+</html>
