@@ -4,55 +4,57 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Current Weather - MDA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: 'Roboto', sans-serif;
       background-color: #062f52;
+      font-family: 'Roboto', sans-serif;
       color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100vh;
-      overflow: hidden;
+      padding-top: 40px;
+      box-sizing: border-box;
     }
     .logo {
-      width: 300px;
-      margin-bottom: 2rem;
+      width: 360px;
+      margin-bottom: 30px;
       filter: brightness(0) invert(1);
     }
     h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 3.5rem;
+      margin-bottom: 40px;
     }
     .weather-icon {
-      width: 150px;
-      height: 150px;
+      width: 180px;
+      height: 180px;
+      margin-bottom: 30px;
     }
     .description {
-      font-size: 2rem;
+      font-size: 2.5rem;
       text-transform: capitalize;
-      margin: 1rem 0;
+      margin-bottom: 20px;
     }
     .temperature {
-      font-size: 5rem;
+      font-size: 5.5rem;
       font-weight: bold;
+      margin-bottom: 20px;
     }
     .details {
-      font-size: 1.2rem;
-      margin-top: 1rem;
+      font-size: 2rem;
     }
   </style>
 </head>
 <body>
-  <img src="logo.png" alt="logo" class="logo" />
+  <img src="logo.png" class="logo" />
   <h1>Current Weather</h1>
-  <img id="weatherIcon" class="weather-icon" alt="icon" />
-  <div class="description" id="description">Loading...</div>
-  <div class="temperature" id="temp">--°F</div>
-  <div class="details" id="details">Wind: -- mph | Humidity: --%</div>
+  <img id="weatherIcon" class="weather-icon" alt="Weather Icon" />
+  <div id="description" class="description">Loading...</div>
+  <div id="temp" class="temperature">--°F</div>
+  <div id="details" class="details">Wind: -- mph | Humidity: --%</div>
 
   <script>
     const apiKey = "83a7310014209ebb5b1ddd11ec0e47f3";
@@ -60,19 +62,14 @@
     const lon = -80.0851;
     const iconUrl = "https://openweathermap.org/img/wn/";
 
-    const weatherIcon = document.getElementById('weatherIcon');
-    const description = document.getElementById('description');
-    const temp = document.getElementById('temp');
-    const details = document.getElementById('details');
-
     async function fetchWeather() {
       const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`);
       const data = await res.json();
 
-      description.textContent = data.weather[0].description;
-      temp.textContent = `${Math.round(data.main.temp)}°F`;
-      details.textContent = `Wind: ${data.wind.speed} mph | Humidity: ${data.main.humidity}%`;
-      weatherIcon.src = iconUrl + data.weather[0].icon + "@4x.png";
+      document.getElementById("description").textContent = data.weather[0].description;
+      document.getElementById("temp").textContent = `${Math.round(data.main.temp)}°F`;
+      document.getElementById("details").textContent = `Wind: ${data.wind.speed} mph | Humidity: ${data.main.humidity}%`;
+      document.getElementById("weatherIcon").src = iconUrl + data.weather[0].icon + "@4x.png";
     }
 
     fetchWeather();
