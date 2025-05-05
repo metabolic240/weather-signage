@@ -3,7 +3,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Metabolic Weather Display</title>
   <style>
     body {
@@ -98,6 +97,7 @@
     const apiKey = "83a7310014209ebb5b1ddd11ec0e47f3";
     const lat = 42.1292;
     const lon = -80.0851;
+
     const weatherIcon = document.getElementById("weatherIcon");
     const weatherMain = document.getElementById("weatherMain");
     const temp = document.getElementById("temp");
@@ -149,6 +149,7 @@
       } catch (err) {
         console.error(err);
         weatherMain.textContent = "Error fetching weather";
+        description.textContent = "";
       }
     }
 
