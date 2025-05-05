@@ -148,13 +148,29 @@
   font-weight: 500;
 }
 
+
+#todayIcon {
+  width: 140px !important;
+  height: 140px !important;
+}
+
+.day-card img {
+  width: 100px !important;
+  height: 100px !important;
+}
+
+.hour-card img {
+  width: 64px !important;
+  height: 64px !important;
+}
+
 </style>
 </head>
 <body>
   <div id="todayScreen" class="screen active">
     <div class="today">
       <div class="title">Current Weather</div>
-      <img id="todayIcon" src="" alt="icon" style="width:140px;height:140px;">
+      <img id="todayIcon" src="" alt="icon">
       <div id="todayDesc" class="desc">Loading...</div>
       <div id="todayTemp" class="temp">--°F</div>
       <div id="todayDetails" class="details">Wind: -- mph | Humidity: --%</div>
@@ -293,4 +309,3 @@ loadHourly();
 
 </body>
 </html>
-
