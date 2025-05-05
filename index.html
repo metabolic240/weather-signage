@@ -83,43 +83,50 @@
     const forecastGrid = document.getElementById('forecastGrid');
 
     async function fetchWeather() {
-      const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`);
-      const weatherData = await weatherRes.json();
+      try {
+        const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`);
+        const weatherData = await weatherRes.json();
 
-      description.textContent = weatherData.weather[0].description.replace(/\w/g, c => c.toUpperCase());
-      temp.textContent = `${Math.round(weatherData.main.temp)}°F`;
-      details.textContent = `Wind: ${weatherData.wind.speed} mph | Humidity: ${weatherData.main.humidity}%`;
-      weatherIcon.src = iconUrl + `${weatherData.weather[0].icon}@4x.png`;
+        description.textContent = weatherData.weather[0].description.replace(/\b\w/g, c => c.toUpperCase());
+        temp.textContent = `${Math.round(weatherData.main.temp)}°F`;
+        details.textContent = `Wind: ${weatherData.wind.speed} mph | Humidity: ${weatherData.main.humidity}%`;
+        weatherIcon.src = iconUrl + `${weatherData.weather[0].icon}@4x.png`;
 
-      const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`);
-      const forecastData = await forecastRes.json();
-      forecastGrid.innerHTML = "";
+        const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`);
+        const forecastData = await forecastRes.json();
+        forecastGrid.innerHTML = "";
 
-      const daily = {};
-      forecastData.list.forEach(entry => {
-        const date = new Date(entry.dt_txt).toLocaleDateString("en-US", { weekday: "short" });
-        if (!daily[date]) {
-          daily[date] = { high: entry.main.temp_max, low: entry.main.temp_min, desc: entry.weather[0].description, icon: entry.weather[0].icon };
-        } else {
-          daily[date].high = Math.max(daily[date].high, entry.main.temp_max);
-          daily[date].low = Math.min(daily[date].low, entry.main.temp_min);
-        }
-      });
+        const daily = {};
+        forecastData.list.forEach(entry => {
+          const date = new Date(entry.dt_txt).toLocaleDateString("en-US", { weekday: "short" });
+          if (!daily[date]) {
+            daily[date] = { high: entry.main.temp_max, low: entry.main.temp_min, desc: entry.weather[0].description, icon: entry.weather[0].icon };
+          } else {
+            daily[date].high = Math.max(daily[date].high, entry.main.temp_max);
+            daily[date].low = Math.min(daily[date].low, entry.main.temp_min);
+          }
+        });
 
-      Object.entries(daily).slice(0, 5).forEach(([day, data]) => {
-        const card = document.createElement("div");
-        card.className = "day-card";
-        card.innerHTML = `
-          <h3>${day}</h3>
-          <img src="${iconUrl + data.icon}@2x.png" width="60" />
-          <p>${data.desc}</p>
-          <p>${Math.round(data.low)}° / ${Math.round(data.high)}°F</p>
-        `;
-        forecastGrid.appendChild(card);
-      });
+        Object.entries(daily).slice(0, 5).forEach(([day, data]) => {
+          const card = document.createElement("div");
+          card.className = "day-card";
+          card.innerHTML = `
+            <h3>${day}</h3>
+            <img src="${iconUrl + data.icon}@2x.png" width="60" />
+            <p>${data.desc}</p>
+            <p>${Math.round(data.low)}° / ${Math.round(data.high)}°F</p>
+          `;
+          forecastGrid.appendChild(card);
+        });
+      } catch (err) {
+        console.error("Error during weather fetch/render:", err);
+      }
     }
 
-    fetchWeather();
+    fetchWeather().catch(error => {
+      console.error("Weather fetch failed:", error);
+    });
+
     setInterval(() => {
       current.classList.toggle("hidden");
       forecast.classList.toggle("hidden");
