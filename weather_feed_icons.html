@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Erie Weather Display</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #002B5B;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 2.6vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    #content {
+      line-height: 1.8;
+      padding: 2vh 5vw;
+    }
+    strong {
+      font-size: 3vw;
+      display: block;
+      margin-bottom: 1vh;
+    }
+    .icon {
+      width: 48px;
+      height: 48px;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="content">
+    <div id="weather">Loading weather...</div>
+    <div id="forecast"></div>
+  </div>
+
+  <script>
+    const zip = "16501";
+    const apiKey = "83a7310014209ebb5b1ddd11ec0e47f3";
+    const weatherEl = document.getElementById('weather');
+    const forecastEl = document.getElementById('forecast');
+
+    function getIconUrl(icon) {
+      return `https://openweathermap.org/img/wn/${icon}@2x.png`;
+    }
+
+    async function getWeather() {
+      try {
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?zip=${zip},US&units=imperial&appid=${apiKey}`);
+        const data = await res.json();
+        const icon = getIconUrl(data.weather[0].icon);
+        weatherEl.innerHTML = `
+          <strong>Current Weather - Erie, PA</strong>
+          <div><img src="${icon}" class="icon">${data.weather[0].description.toUpperCase()}</div>
+          <div>${Math.round(data.main.temp)}°F</div>
+          <div>Wind: ${Math.round(data.wind.speed)} mph | Humidity: ${data.main.humidity}%</div>
+        `;
+      } catch (e) {
+        weatherEl.innerText = "Failed to load current weather.";
+      }
+    }
+
+    async function getForecast() {
+      try {
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?zip=${zip},US&units=imperial&appid=${apiKey}`);
+        const data = await res.json();
+        const daily = data.list.filter((_, i) => i % 8 === 0).slice(0, 3);
+        let output = "<strong>3-Day Forecast</strong>";
+        daily.forEach(item => {
+          const date = new Date(item.dt_txt);
+          const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+          const temp = Math.round(item.main.temp);
+          const desc = item.weather[0].description;
+          const icon = getIconUrl(item.weather[0].icon);
+          output += `<div><img src="${icon}" class="icon">${day} - ${desc} - ${temp}°F</div>`;
+        });
+        forecastEl.innerHTML = output;
+      } catch (e) {
+        forecastEl.innerText = "Failed to load forecast.";
+      }
+    }
+
+    getWeather();
+    getForecast();
+    setInterval(() => {
+      getWeather();
+      getForecast();
+    }, 600000); // refresh every 10 minutes
+  </script>
+</body>
+</html>
