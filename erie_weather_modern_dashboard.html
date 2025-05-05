@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Erie Weather Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #002B5B;
+      color: white;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .screen.active {
+      opacity: 1;
+      z-index: 1;
+    }
+
+    .today {
+      text-align: center;
+    }
+
+    .today .temp {
+      font-size: 5vw;
+      font-weight: bold;
+    }
+
+    .today .desc {
+      font-size: 2.5vw;
+      margin: 0.5vh 0;
+    }
+
+    .today .details {
+      font-size: 1.8vw;
+      color: #cce0ff;
+    }
+
+    .today .text {
+      font-size: 1.8vw;
+      max-width: 70vw;
+      margin: 2vh auto 0;
+      line-height: 1.4;
+    }
+
+    .forecast {
+      display: flex;
+      justify-content: center;
+      gap: 1.5vw;
+      padding: 3vh 0;
+    }
+
+    .day-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2vh 1vw;
+      border-radius: 10px;
+      width: 12vw;
+      text-align: center;
+    }
+
+    .day-card.today {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid #66ccff;
+    }
+
+    .day-card .label {
+      font-weight: bold;
+      font-size: 1.5vw;
+    }
+
+    .day-card img {
+      width: 64px;
+      height: 64px;
+      margin: 1vh 0;
+    }
+
+    .day-card .desc {
+      font-size: 1.1vw;
+      margin-bottom: 1vh;
+    }
+
+    .day-card .temp {
+      font-size: 1.3vw;
+    }
+  </style>
+</head>
+<body>
+  <div id="todayScreen" class="screen active">
+    <div class="today">
+      <div id="todayLabel" class="label">Today - Erie, PA</div>
+      <img id="todayIcon" src="" alt="icon">
+      <div id="todayDesc" class="desc">Loading...</div>
+      <div id="todayTemp" class="temp">--°F</div>
+      <div id="todayDetails" class="details">Wind: -- mph | Humidity: --%</div>
+      <div id="todayText" class="text">Fetching detailed forecast...</div>
+    </div>
+  </div>
+
+  <div id="forecastScreen" class="screen">
+    <div class="forecast" id="forecastGrid"></div>
+  </div>
+
+  <script>
+    const apiKey = "83a7310014209ebb5b1ddd11ec0e47f3";
+    const zip = "16501";
+
+    const screens = document.querySelectorAll('.screen');
+    let currentScreen = 0;
+
+    function rotateScreens() {
+      screens[currentScreen].classList.remove('active');
+      currentScreen = (currentScreen + 1) % screens.length;
+      screens[currentScreen].classList.add('active');
+    }
+
+    setInterval(rotateScreens, 20000);
+
+    function getIcon(icon) {
+      return `https://openweathermap.org/img/wn/${icon}@2x.png`;
+    }
+
+    async function loadWeather() {
+      try {
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?zip=${zip},US&units=imperial&appid=${apiKey}`);
+        const data = await res.json();
+
+        document.getElementById("todayIcon").src = getIcon(data.weather[0].icon);
+        document.getElementById("todayDesc").textContent = data.weather[0].description;
+        document.getElementById("todayTemp").textContent = Math.round(data.main.temp) + "°F";
+        document.getElementById("todayDetails").textContent = `Wind: ${Math.round(data.wind.speed)} mph | Humidity: ${data.main.humidity}%`;
+
+        const todayText = `Expect ${data.weather[0].description} today with a high near ${Math.round(data.main.temp_max)}°F. Winds around ${Math.round(data.wind.speed)} mph and humidity holding at ${data.main.humidity}%.`;
+        document.getElementById("todayText").textContent = todayText;
+      } catch (e) {
+        document.getElementById("todayText").textContent = "Unable to load today's weather.";
+      }
+    }
+
+    async function loadForecast() {
+      try {
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?zip=${zip},US&units=imperial&appid=${apiKey}`);
+        const data = await res.json();
+
+        const forecastGrid = document.getElementById("forecastGrid");
+        forecastGrid.innerHTML = "";
+
+        const daily = data.list.filter((_, i) => i % 8 === 0).slice(0, 5);
+        daily.forEach((item, idx) => {
+          const date = new Date(item.dt_txt);
+          const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+          const temp = Math.round(item.main.temp);
+          const desc = item.weather[0].main;
+          const icon = getIcon(item.weather[0].icon);
+
+          const card = document.createElement("div");
+          card.className = "day-card" + (idx === 0 ? " today" : "");
+
+          card.innerHTML = `
+            <div class="label">${day}</div>
+            <img src="${icon}">
+            <div class="desc">${desc}</div>
+            <div class="temp">${temp}°F</div>
+          `;
+          forecastGrid.appendChild(card);
+        });
+      } catch (e) {
+        document.getElementById("forecastGrid").innerHTML = "Forecast unavailable.";
+      }
+    }
+
+    loadWeather();
+    loadForecast();
+    setInterval(() => {
+      loadWeather();
+      loadForecast();
+    }, 600000);
+  </script>
+</body>
+</html>
