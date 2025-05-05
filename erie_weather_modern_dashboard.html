@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Erie Weather Dashboard</title>
+  <title>Erie Weather Display</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -36,77 +36,124 @@
       z-index: 1;
     }
 
-    .today {
-      text-align: center;
+    .today .title {
+      font-size: 3vw;
+      font-weight: bold;
+      margin-bottom: 2vh;
     }
 
-    .today .temp {
-      font-size: 5vw;
-      font-weight: bold;
+    .today img {
+      width: 100px;
+      height: 100px;
     }
 
     .today .desc {
-      font-size: 2.5vw;
-      margin: 0.5vh 0;
+      font-size: 2.2vw;
+      text-transform: capitalize;
+      margin: 1vh 0;
+    }
+
+    .today .temp {
+      font-size: 6vw;
+      font-weight: bold;
     }
 
     .today .details {
-      font-size: 1.8vw;
+      font-size: 1.5vw;
       color: #cce0ff;
+      margin-top: 1vh;
     }
 
     .today .text {
-      font-size: 1.8vw;
-      max-width: 70vw;
-      margin: 2vh auto 0;
+      font-size: 1.6vw;
+      max-width: 75vw;
+      margin-top: 2vh;
+      text-align: center;
       line-height: 1.4;
+    }
+
+    .forecast-title {
+      font-size: 2.8vw;
+      font-weight: bold;
+      margin-bottom: 3vh;
     }
 
     .forecast {
       display: flex;
       justify-content: center;
-      gap: 1.5vw;
-      padding: 3vh 0;
+      flex-wrap: nowrap;
+      gap: 2vw;
     }
 
     .day-card {
       background: rgba(255, 255, 255, 0.1);
       padding: 2vh 1vw;
-      border-radius: 10px;
+      border-radius: 12px;
       width: 12vw;
+      min-width: 150px;
       text-align: center;
     }
 
     .day-card.today {
-      background: rgba(255, 255, 255, 0.2);
-      border: 2px solid #66ccff;
+      border: 3px solid #66ccff;
     }
 
     .day-card .label {
       font-weight: bold;
-      font-size: 1.5vw;
+      font-size: 1.8vw;
+      margin-bottom: 1vh;
     }
 
     .day-card img {
       width: 64px;
       height: 64px;
-      margin: 1vh 0;
     }
 
     .day-card .desc {
-      font-size: 1.1vw;
-      margin-bottom: 1vh;
+      font-size: 1.2vw;
+      text-transform: capitalize;
+      margin: 1vh 0;
     }
 
     .day-card .temp {
-      font-size: 1.3vw;
+      font-size: 1.5vw;
+      font-weight: 500;
     }
-  </style>
+  
+.hour-card {
+  background: rgba(255,255,255,0.1);
+  padding: 2vh 1vw;
+  border-radius: 12px;
+  width: 10vw;
+  min-width: 100px;
+  text-align: center;
+  margin-bottom: 2vh;
+}
+.hour-card .label {
+  font-weight: bold;
+  font-size: 1.2vw;
+  margin-bottom: 1vh;
+}
+.hour-card img {
+  width: 48px;
+  height: 48px;
+}
+.hour-card .desc {
+  font-size: 1vw;
+  text-transform: capitalize;
+  margin: 1vh 0;
+}
+.hour-card .temp {
+  font-size: 1.3vw;
+  font-weight: 500;
+}
+
+</style>
 </head>
 <body>
   <div id="todayScreen" class="screen active">
     <div class="today">
-      <div id="todayLabel" class="label">Today - Erie, PA</div>
+      <div class="title">Current Weather</div>
       <img id="todayIcon" src="" alt="icon">
       <div id="todayDesc" class="desc">Loading...</div>
       <div id="todayTemp" class="temp">--°F</div>
@@ -116,6 +163,7 @@
   </div>
 
   <div id="forecastScreen" class="screen">
+    <div class="forecast-title">5-Day Outlook</div>
     <div class="forecast" id="forecastGrid"></div>
   </div>
 
@@ -124,6 +172,7 @@
     const zip = "16501";
 
     const screens = document.querySelectorAll('.screen');
+let totalScreens = 3;
     let currentScreen = 0;
 
     function rotateScreens() {
@@ -168,7 +217,7 @@
           const date = new Date(item.dt_txt);
           const day = date.toLocaleDateString('en-US', { weekday: 'short' });
           const temp = Math.round(item.main.temp);
-          const desc = item.weather[0].main;
+          const desc = item.weather[0].description;
           const icon = getIcon(item.weather[0].icon);
 
           const card = document.createElement("div");
@@ -178,7 +227,7 @@
             <div class="label">${day}</div>
             <img src="${icon}">
             <div class="desc">${desc}</div>
-            <div class="temp">${temp}°F</div>
+            <div class="temp">${Math.round(item.main.temp_min)}° / ${Math.round(item.main.temp_max)}°F</div>
           `;
           forecastGrid.appendChild(card);
         });
@@ -193,6 +242,55 @@
       loadWeather();
       loadForecast();
     }, 600000);
-  </script>
+  
+async function loadHourly() {
+  try {
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?zip=${zip},US&units=imperial&appid=${apiKey}`);
+    const data = await res.json();
+    const hourlyGrid = document.getElementById("hourlyGrid");
+    hourlyGrid.innerHTML = "";
+
+    const now = new Date();
+    const upcoming = data.list.filter(item => {
+      const dt = new Date(item.dt_txt);
+      return dt > now && dt.getHours() % 3 === 0;
+    }).slice(0, 8); // show next 8 time blocks (24 hours)
+
+    upcoming.forEach(item => {
+      const time = new Date(item.dt_txt).toLocaleTimeString([], { hour: 'numeric' });
+      const icon = getIcon(item.weather[0].icon);
+      const desc = item.weather[0].description;
+      const temp = Math.round(item.main.temp);
+
+      const card = document.createElement("div");
+      card.className = "hour-card";
+      card.innerHTML = `
+        <div class="label">${time}</div>
+        <img src="${icon}">
+        <div class="desc">${desc}</div>
+        <div class="temp">${temp}°F</div>
+      `;
+      hourlyGrid.appendChild(card);
+    });
+  } catch (e) {
+    document.getElementById("hourlyGrid").innerHTML = "Hourly forecast unavailable.";
+  }
+}
+
+setInterval(() => {
+  loadWeather();
+  loadForecast();
+  loadHourly();
+}, 600000);
+loadHourly();
+
+</script>
+
+<div id="hourlyScreen" class="screen">
+  <div class="forecast-title">24-Hour Forecast</div>
+  <div class="forecast" id="hourlyGrid" style="flex-wrap: wrap; gap: 1vw;"></div>
+</div>
+
 </body>
 </html>
+
