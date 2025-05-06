@@ -11,52 +11,65 @@
       font-family: 'Roboto', sans-serif;
       background-color: #062f52;
       color: white;
-      padding: 3vh 3vw;
+      padding: 3vh 5vw;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     .logo {
-      width: 20vw; max-width: 400px;
+      width: 20vw;
+      max-width: 400px;
       margin-bottom: 3vh;
       filter: brightness(0) invert(1);
     }
+
     h1 {
-      font-size: 4vw;
-      margin-bottom: 3vh;
+      font-size: clamp(24px, 3vw, 50px);
+      margin-bottom: 2vh;
     }
+
     .forecast-grid {
       display: flex;
-      justify-content: space-between;
-      gap: 2vw;
+      justify-content: center;
+      gap: 3vw;
       width: 100%;
       max-width: 1700px;
+      flex-wrap: wrap;
     }
+
     .day-card {
-      flex: 1;
-      background: rgba(255,255,255,0.1);
-      border-radius: 15px;
-      padding: 30px 20px;
+      flex: 1 1 15%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2vh 1vw;
+      min-width: 200px;
+      max-width: 240px;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1vh;
     }
+
     .day-card img {
-      width: 10vw; max-width: 150px;
-      height: 10vw; max-height: 150px;
-      margin: 10px 0;
+      width: clamp(60px, 9vw, 120px);
+      height: auto;
     }
+
     .day-name {
-      font-size: 2.2vw;
-      font-weight: bold;
-      margin-bottom: 10px;
+      font-size: clamp(16px, 2vw, 32px);
+      font-weight: 700;
     }
+
     .desc {
-      font-size: 1.8vw;
+      font-size: clamp(14px, 1.8vw, 24px);
       text-transform: capitalize;
-      margin: 10px 0;
     }
+
     .temps {
-      font-size: 2vw;
+      font-size: clamp(18px, 2vw, 28px);
       font-weight: 500;
     }
   </style>
@@ -82,7 +95,12 @@
         const date = new Date(entry.dt_txt);
         const day = date.toLocaleDateString("en-US", { weekday: "short" });
         if (!daily[day]) {
-          daily[day] = { high: entry.main.temp_max, low: entry.main.temp_min, desc: entry.weather[0].description, icon: entry.weather[0].icon };
+          daily[day] = {
+            high: entry.main.temp_max,
+            low: entry.main.temp_min,
+            desc: entry.weather[0].description,
+            icon: entry.weather[0].icon
+          };
         } else {
           daily[day].high = Math.max(daily[day].high, entry.main.temp_max);
           daily[day].low = Math.min(daily[day].low, entry.main.temp_min);
