@@ -16,35 +16,44 @@
       align-items: center;
       justify-content: flex-start;
       height: 100vh;
-      padding-top: 40px;
+      padding: 4vh 5vw;
       box-sizing: border-box;
     }
+
     .logo {
-      width: 20vw; max-width: 400px;
+      width: 20vw;
+      max-width: 400px;
       margin-bottom: 3vh;
       filter: brightness(0) invert(1);
     }
+
     h1 {
-      font-size: 4vw;
-      margin-bottom: 40px;
-    }
-    .weather-icon {
-      width: 12vw; max-width: 14vw; max-width: 220px;
-      height: 12vw; max-height: 14vw; max-height: 220px;
+      font-size: clamp(28px, 3.5vw, 60px);
       margin-bottom: 3vh;
     }
+
+    .weather-icon {
+      width: clamp(80px, 12vw, 180px);
+      height: auto;
+      margin-bottom: 3vh;
+    }
+
     .description {
-      font-size: 3vw;
+      font-size: clamp(20px, 2.8vw, 48px);
       text-transform: capitalize;
-      margin-bottom: 20px;
+      margin-bottom: 2vh;
+      text-align: center;
     }
+
     .temperature {
-      font-size: 6vw;
+      font-size: clamp(36px, 6vw, 96px);
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 2vh;
     }
+
     .details {
-      font-size: 2.2vw;
+      font-size: clamp(18px, 2.2vw, 36px);
+      text-align: center;
     }
   </style>
 </head>
