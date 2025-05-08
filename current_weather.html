@@ -6,59 +6,60 @@
   <title>Current Weather - MDA</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      background-color: #062f52;
-      font-family: 'Roboto', sans-serif;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100vh;
-      padding: 4vh 5vw;
+    * {
       box-sizing: border-box;
     }
 
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #062f52;
+      font-family: 'Roboto', sans-serif;
+      color: white;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      text-align: center;
+    }
+
     .logo {
-      width: 20vw;
-      max-width: 400px;
-      margin-bottom: 3vh;
+      max-width: 25vw;
       filter: brightness(0) invert(1);
     }
 
     h1 {
-      font-size: clamp(28px, 3.5vw, 60px);
-      margin-bottom: 3vh;
+      font-size: 5vw;
+      margin: 0.5em 0;
     }
 
     .weather-icon {
-      width: clamp(80px, 12vw, 180px);
-      height: auto;
-      margin-bottom: 3vh;
+      width: 20vw;
+      height: 20vw;
+      max-width: 240px;
+      max-height: 240px;
     }
 
     .description {
-      font-size: clamp(20px, 2.8vw, 48px);
+      font-size: 3vw;
       text-transform: capitalize;
-      margin-bottom: 2vh;
-      text-align: center;
     }
 
     .temperature {
-      font-size: clamp(36px, 6vw, 96px);
+      font-size: 8vw;
       font-weight: bold;
-      margin-bottom: 2vh;
     }
 
     .details {
-      font-size: clamp(18px, 2.2vw, 36px);
-      text-align: center;
+      font-size: 2.5vw;
+      margin-top: 1em;
     }
   </style>
 </head>
 <body>
-  <img src="logo.png" class="logo" />
+  <img src="logo.png" class="logo" alt="Metabolic Logo" />
   <h1>Current Weather</h1>
   <img id="weatherIcon" class="weather-icon" alt="Weather Icon" />
   <div id="description" class="description">Loading...</div>
