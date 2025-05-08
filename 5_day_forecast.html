@@ -6,76 +6,81 @@
   <title>5-Day Forecast - MDA</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
+      padding: 3vh 4vw;
       font-family: 'Roboto', sans-serif;
       background-color: #062f52;
       color: white;
-      padding: 3vh 5vw;
-      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 3vh;
+      height: 100vh;
+      width: 100vw;
     }
 
     .logo {
-      width: 20vw;
-      max-width: 400px;
-      margin-bottom: 3vh;
+      max-width: 20vw;
       filter: brightness(0) invert(1);
     }
 
     h1 {
-      font-size: clamp(24px, 3vw, 50px);
-      margin-bottom: 2vh;
+      font-size: 4.5vw;
+      margin: 0;
     }
 
     .forecast-grid {
       display: flex;
-      justify-content: center;
-      gap: 3vw;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: 2vw;
       width: 100%;
-      max-width: 1700px;
-      flex-wrap: wrap;
+      flex-grow: 1;
     }
 
     .day-card {
-      flex: 1 1 15%;
-      background: rgba(255, 255, 255, 0.1);
+      flex: 1;
+      background: rgba(255,255,255,0.1);
       border-radius: 20px;
       padding: 2vh 1vw;
-      min-width: 200px;
-      max-width: 240px;
-      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1vh;
+      justify-content: center;
+      text-align: center;
     }
 
     .day-card img {
-      width: clamp(60px, 9vw, 120px);
+      width: 8vw;
+      max-width: 140px;
       height: auto;
+      margin: 1vh 0;
     }
 
     .day-name {
-      font-size: clamp(16px, 2vw, 32px);
-      font-weight: 700;
+      font-size: 2vw;
+      font-weight: bold;
     }
 
     .desc {
-      font-size: clamp(14px, 1.8vw, 24px);
+      font-size: 1.7vw;
+      margin: 1vh 0;
       text-transform: capitalize;
     }
 
     .temps {
-      font-size: clamp(18px, 2vw, 28px);
+      font-size: 2vw;
       font-weight: 500;
     }
   </style>
 </head>
 <body>
-  <img src="logo.png" class="logo" />
+  <img src="logo.png" class="logo" alt="Metabolic Logo" />
   <h1>5-Day Outlook</h1>
   <div class="forecast-grid" id="forecastGrid"></div>
 
@@ -124,3 +129,4 @@
   </script>
 </body>
 </html>
+
