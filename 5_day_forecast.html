@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=1920, initial-scale=1.0, user-scalable=no" />
   <title>5-Day Forecast - MDA</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -12,26 +12,28 @@
 
     body {
       margin: 0;
-      padding: 3vh 4vw;
+      padding: 2vh 3vw;
       font-family: 'Roboto', sans-serif;
       background-color: #062f52;
       color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3vh;
+      justify-content: flex-start;
+      gap: 2vh;
       height: 100vh;
       width: 100vw;
     }
 
     .logo {
-      max-width: 20vw;
+      width: 22vw;
+      max-width: 400px;
       filter: brightness(0) invert(1);
     }
 
     h1 {
-      font-size: 4.5vw;
-      margin: 0;
+      font-size: 5vw;
+      margin: 1vh 0;
     }
 
     .forecast-grid {
@@ -40,35 +42,31 @@
       align-items: stretch;
       gap: 2vw;
       width: 100%;
+      background-color: rgba(255, 255, 255, 0.05); /* Temp diagnostic */
+      border-radius: 10px;
+      padding: 2vh 1vw;
       flex-grow: 1;
     }
 
     .day-card {
       flex: 1;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 20px;
-      padding: 2vh 1vw;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: space-evenly;
+      padding: 2vh 1vw;
       text-align: center;
     }
 
-    .day-card img {
-      width: 8vw;
-      max-width: 140px;
-      height: auto;
-      margin: 1vh 0;
-    }
-
     .day-name {
-      font-size: 2vw;
+      font-size: 2.2vw;
       font-weight: bold;
     }
 
     .desc {
-      font-size: 1.7vw;
+      font-size: 1.8vw;
       margin: 1vh 0;
       text-transform: capitalize;
     }
@@ -77,10 +75,17 @@
       font-size: 2vw;
       font-weight: 500;
     }
+
+    .day-card img {
+      width: 9vw;
+      max-width: 160px;
+      height: auto;
+      margin: 1vh 0;
+    }
   </style>
 </head>
 <body>
-  <img src="logo.png" class="logo" alt="Metabolic Logo" />
+  <img src="logo.png" class="logo" alt="MDA TV Logo" />
   <h1>5-Day Outlook</h1>
   <div class="forecast-grid" id="forecastGrid"></div>
 
