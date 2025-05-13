@@ -6,60 +6,50 @@
   <title>Current Weather - MDA</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      padding: 0;
       background-color: #062f52;
       font-family: 'Roboto', sans-serif;
       color: white;
-      height: 100vh;
-      width: 100vw;
       display: flex;
       flex-direction: column;
-      justify-content: space-evenly;
       align-items: center;
-      text-align: center;
+      justify-content: flex-start;
+      height: 100vh;
+      padding-top: 40px;
+      box-sizing: border-box;
     }
-
     .logo {
-      max-width: 25vw;
+      width: 360px;
+      margin-bottom: 30px;
       filter: brightness(0) invert(1);
     }
-
     h1 {
-      font-size: 5vw;
-      margin: 0.5em 0;
+      font-size: 3.5rem;
+      margin-bottom: 40px;
     }
-
     .weather-icon {
-      width: 20vw;
-      height: 20vw;
-      max-width: 240px;
-      max-height: 240px;
+      width: 180px;
+      height: 180px;
+      margin-bottom: 30px;
     }
-
     .description {
-      font-size: 3vw;
+      font-size: 2.5rem;
       text-transform: capitalize;
+      margin-bottom: 20px;
     }
-
     .temperature {
-      font-size: 8vw;
+      font-size: 5.5rem;
       font-weight: bold;
+      margin-bottom: 20px;
     }
-
     .details {
-      font-size: 2.5vw;
-      margin-top: 1em;
+      font-size: 2rem;
     }
   </style>
 </head>
 <body>
-  <img src="logo.png" class="logo" alt="Metabolic Logo" />
+  <img src="logo.png" class="logo" />
   <h1>Current Weather</h1>
   <img id="weatherIcon" class="weather-icon" alt="Weather Icon" />
   <div id="description" class="description">Loading...</div>
