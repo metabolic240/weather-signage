@@ -6,9 +6,7 @@
   <title>5-Day Forecast - MDA</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -23,6 +21,16 @@
       gap: 2vh;
       height: 100vh;
       width: 100vw;
+    }
+
+    #content {
+      opacity: 0;
+      transition: opacity 0.8s ease-in;
+      width: 100%;
+    }
+
+    #content.loaded {
+      opacity: 1;
     }
 
     .logo {
@@ -42,7 +50,7 @@
       align-items: stretch;
       gap: 2vw;
       width: 100%;
-      background-color: rgba(255, 255, 255, 0.05); /* Temp diagnostic */
+      background-color: rgba(255, 255, 255, 0.05);
       border-radius: 10px;
       padding: 2vh 1vw;
       flex-grow: 1;
@@ -73,7 +81,7 @@
 
     .temps {
       font-size: 2.6vw;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .day-card img {
@@ -85,9 +93,11 @@
   </style>
 </head>
 <body>
-  <img src="logo.png" class="logo" alt="MDA TV Logo" />
-  <h1>5-Day Outlook</h1>
-  <div class="forecast-grid" id="forecastGrid"></div>
+  <div id="content">
+    <img src="logo.png" class="logo" alt="MDA TV Logo" />
+    <h1>5-Day Outlook</h1>
+    <div class="forecast-grid" id="forecastGrid"></div>
+  </div>
 
   <script>
     const apiKey = "83a7310014209ebb5b1ddd11ec0e47f3";
@@ -128,6 +138,8 @@
         `;
         forecastGrid.appendChild(card);
       });
+
+      document.getElementById("content").classList.add("loaded");
     }
 
     fetchForecast();
